@@ -1,5 +1,7 @@
+from echeancier import Echeancier
+
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
-import random as rd
+import random
 
 def ArriveeBus():
 
@@ -51,7 +53,7 @@ def DebSimulation():
     Qr = 0
     Bc = 0
     Br = 0
-    echeancier.add_event(ArriveeBus,DateSimu+rd.expovariate(3/4),0)
+    echeancier.add_event(ArriveeBus,DateSimu+random.expovariate(3/4),0)
     echeancier.add_event(FinSimulation,40.0,0)
 
 def FinSimulation():
@@ -59,15 +61,17 @@ def FinSimulation():
 
 
 def MaJAires(D1,D2):
+    global AireQc, AireQr, AireBr ,Qc, Qr, Br
+    AireQC = AireQc + (D2 - D1)*Qc
+    AireQr = AireQr + (D2 - D1)*Qr
+    AireBr = AireBr + (D2 - D1)*Br
 
-
-
-DebSimulation()
-# Simulateur
+#Simulateur
 DateSimu = float(0)
+echeancier = Echeancier()
 echeancier.add_event(DebSimulation, DateSimu,10000)
 while echeancier.notvide() : #Nom à changer
-    couple = echeancier.get( #Nom à changer
+    couple = echeancier.get_next_event() #Nom à changer
     MaJAires(DateSimu,couple[1])
     DateSimu = couple[1]
     func = globals()[couple[0]]
