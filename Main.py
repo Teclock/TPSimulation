@@ -1,5 +1,4 @@
 from echeancier import Echeancier
-
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
 import random
 
@@ -67,7 +66,7 @@ def DebSimulation():
     Qr = 0
     Bc = 0
     Br = 0
-    echeancier.add_event(ArriveeBus,DateSimu+random.expovariate(3/4),0)
+    echeancier.add_event(ArriveeBus,DateSimu+random.expovariate(1/(3/4)),0)
     echeancier.add_event(FinSimulation,40.0,0)
 
 def FinSimulation():

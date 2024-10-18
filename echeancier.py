@@ -16,7 +16,12 @@ class Echeancier:
 
         # trouver l'index ou inserer l'event
         index = 0
-        while index < len(self.__echeancier) and self.__echeancier[index][1] <= date:
+        n = len(self.__echeancier)
+        while index < n and (self.__echeancier[index][1] < date or (self.__echeancier[index][1] == date and self.__echeancier[index][2] > priorite)):
+            c1 = index < n
+            c2 = self.__echeancier[index][1] < date
+            c3 = self.__echeancier[index][1] == date
+            c4 = self.__echeancier[index][2] > priorite
             index += 1
 
         # insertion de l'event a l'index voulu
@@ -31,5 +36,24 @@ class Echeancier:
 
         return self.__echeancier.pop(0)
 
+    def clear(self):
+        """Vide l'echeancier
+
+        """
+
+        self.__echeancier.clear()
+
+    def size(self):
+        """Retourne la taille de l'echeancier
+
+        :return: la taille de l'echeancier
+        :rtype: int
+        """
+
+        return len(self.__echeancier)
+
     def __str__(self):
-        return str(self.__echeancier)
+        string = ""
+        for (event, date, priorite) in self.__echeancier:
+            string += f"[{date}, {event}, {priorite}]\n"
+        return string
