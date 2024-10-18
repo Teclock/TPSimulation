@@ -55,8 +55,10 @@ def DebSimulation():
     # 5
 
 def FinSimulation():
-    
-
+    echeancier.clear()
+    TmpMoyenAvContr = AireQc / NbBus # Temps d'attente moyen avant contrôle
+    TmpMoyenAvRep = AireQr / NbBusRep # Temps d'attente moyen avant réparation
+    TmpUtilCentreRep = AireBr / (2 * 160) # Taux d'utilisation du centre de réparation
 
 def MaJAires():
 
