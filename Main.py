@@ -92,3 +92,7 @@ while echeancier.notvide() : #Nom à changer
     DateSimu = couple[1]
     func = globals()[couple[0]]
     func()
+
+print("TmpMoyenAvContr : ", TmpMoyenAvContr)
+print("TmpMoyenAvRep : ", TmpMoyenAvRep)
+print("TmpUtilCentreRep : ", TmpUtilCentreRep)
