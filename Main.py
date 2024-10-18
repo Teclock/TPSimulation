@@ -1,3 +1,4 @@
+global NbBus, NbBusRep, AireQc, AireQr, AireBr
 
 def ArriveeBus():
 
@@ -19,7 +20,7 @@ def AccesReparation():
 
 def DepartReparation():
 
-    
+
 
 def DepartReparation():
 
