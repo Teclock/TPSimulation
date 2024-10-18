@@ -70,6 +70,7 @@ def DebSimulation():
     echeancier.add_event(FinSimulation,40.0,0)
 
 def FinSimulation():
+    global TmpMoyenAvContr, TmpMoyenAvRep, TmpUtilCentreRep
     echeancier.clear()
     TmpMoyenAvContr = AireQc / NbBus
     TmpMoyenAvRep = AireQr / NbBusRep
