@@ -1,36 +1,36 @@
 from echeancier import Echeancier
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, TmpUtilCentreRep
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
 import random
 
 def ArriveeBus():
     global NbBus, DateSimu
 
     heure = DateSimu + random.expovariate(1/0.75)
-    echeancier.add_event(ArriveeBus, heure)
+    echeancier.add_event("ArriveeBus", heure)
     NbBus += 1
-    echeancier.add_event(ArriveeFileC, DateSimu)
+    echeancier.add_event("ArriveeFileC", DateSimu)
 
 def ArriveeFileC():
-    global QC, BC, DateSimu
-    QC = QC + 1
-    if BC == 0:
-        echeancier.add_event(AccesControle, DateSimu)
+    global Qc, Bc, DateSimu
+    Qc = Qc + 1
+    if Bc == 0:
+        echeancier.add_event("AccesControle", DateSimu)
 
 def AccesControle():
-    global QC, BC, DateSimu
-    QC -= 1
-    BC = 1
+    global Qc, Bc, DateSimu
+    Qc -= 1
+    Bc = 1
     DateSimu += random.uniform(1 / 4, 13 / 12)
-    echeancier.add_event(DepartControle, DateSimu)
+    echeancier.add_event("DepartControle", DateSimu)
 
 def DepartControle():
-    global QC, BC, DateSimu
-    BC = 0
-    if QC > 0:
-        echeancier.add_event(AccesControle, DateSimu)
-    reparation = random.randint(10)
+    global Qc, Bc, DateSimu
+    Bc = 0
+    if Qc > 0:
+        echeancier.add_event("AccesControle", DateSimu)
+    reparation = random.randint(1,10)
     if reparation <= 3:  # 30% de chance
-        echeancier.add_event(ArriveeFileR, DateSimu)
+        echeancier.add_event("ArriveeFileR", DateSimu)
 
 def ArriveeFileR():
     global Qr, NbBusRep, Br, DateSimu
@@ -38,7 +38,7 @@ def ArriveeFileR():
     Qr += 1
     NbBusRep += 1
     if Br < 2 :
-        echeancier.add_event(AccesReparation, DateSimu)
+        echeancier.add_event("AccesReparation", DateSimu)
 
 def AccesReparation():
     global Qr, Br, DateSimu
@@ -46,14 +46,14 @@ def AccesReparation():
     Qr -= 1
     Br += 1
     heure = DateSimu + random.uniform(2.8, 5.5)
-    echeancier.add_event(DepartReparation, heure)
+    echeancier.add_event("DepartReparation", heure)
 
 def DepartReparation():
     global Qr, Br, DateSimu
 
     Br -= 1
     if Qr > 0 :
-        echeancier.add_event(AccesReparation, DateSimu)
+        echeancier.add_event("AccesReparation", DateSimu)
 
 def DebSimulation():
     global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
@@ -66,8 +66,8 @@ def DebSimulation():
     Qr = 0
     Bc = 0
     Br = 0
-    echeancier.add_event(ArriveeBus,DateSimu+random.expovariate(1/(3/4)),0)
-    echeancier.add_event(FinSimulation,40.0,0)
+    echeancier.add_event("ArriveeBus",DateSimu+random.expovariate(1/(3/4)),0)
+    echeancier.add_event("FinSimulation",40.0,0)
 
 def FinSimulation():
     global TmpMoyenAvContr, TmpMoyenAvRep, TmpUtilCentreRep
@@ -85,7 +85,7 @@ def MaJAires(D1,D2):
 #Simulateur
 DateSimu = float(0)
 echeancier = Echeancier()
-echeancier.add_event(DebSimulation, DateSimu,10000)
+DebSimulation()
 while echeancier.size() > 0 :
     couple = echeancier.get_next_event()
     MaJAires(DateSimu,couple[1])
