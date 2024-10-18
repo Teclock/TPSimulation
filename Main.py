@@ -4,7 +4,12 @@ global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
 import random
 
 def ArriveeBus():
+    global NbBus, DateSimu
 
+    heure = DateSimu + random.expovariate(1/0.75)
+    echeancier.add_event("ArriveeBus", heure)
+    NbBus += 1
+    echeancier.add_event("ArriveeFileC", DateSimu)
 
 def ArriveeFileC():
     global QC, BC, DateSimu
@@ -29,18 +34,27 @@ def DepartControle():
         echeancier.add_event("ArrivéeFileR", DateSimu)
 
 def ArriveeFileR():
+    global Qr, NbBusRep, Br, DateSimu
 
+    Qr += 1
+    NbBusRep += 1
+    if Br < 2 :
+        echeancier.add_event("AccesReparation", DateSimu)
 
 def AccesReparation():
+    global Qr, Br, DateSimu
 
+    Qr -= 1
+    Br += 1
+    heure = DateSimu + random.uniform(2.8, 5.5)
+    echeancier.add_event("DepartReparation", heure)
 
 def DepartReparation():
+    global Qr, Br, DateSimu
 
-
-
-def DepartReparation():
-
-
+    Br -= 1
+    if Qr > 0 :
+        echeancier.add_event("AccesReparation", DateSimu)
 
 def DebSimulation():
     global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
@@ -78,4 +92,3 @@ while echeancier.notvide() : #Nom à changer
     DateSimu = couple[1]
     func = globals()[couple[0]]
     func()
-
