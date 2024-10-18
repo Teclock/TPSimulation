@@ -1,4 +1,4 @@
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
 
 def ArriveeBus():
 
@@ -51,3 +51,4 @@ def MaJAires():
 
 DebSimulation()
 # Simulateur
+DateSimu = 0
