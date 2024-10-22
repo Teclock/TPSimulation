@@ -20,8 +20,8 @@ def AccesControle():
     global Qc, Bc, DateSimu
     Qc -= 1
     Bc = 1
-    DateSimu += random.uniform(1 / 4, 13 / 12)
-    echeancier.add_event("DepartControle", DateSimu)
+    heure = DateSimu + random.uniform(1 / 4, 13 / 12)
+    echeancier.add_event("DepartControle", heure)
 
 def DepartControle():
     global Qc, Bc, DateSimu
