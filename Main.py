@@ -1,5 +1,7 @@
 from echeancier import Echeancier
 import random
+import matplotlib.pyplot as plt
+import numpy as np
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
 
 
@@ -94,6 +96,10 @@ def MaJAires(D1, D2):
 #Simulateur
 file = open("stat.csv", 'w')
 file.write("TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep\n")
+
+liste_TmpMoyAvContr = []
+liste_TmpMoyAvRep = []
+liste_TauxUtilCentreRep = []
 for j in [40,80,160,240]:
     for i in range(0,50):
         TempsSimulateur = j
@@ -113,3 +119,18 @@ for j in [40,80,160,240]:
         #print("TmpMoyenAvContr : ", TmpMoyenAvContr)
         #print("TmpMoyenAvRep : ", TmpMoyenAvRep)
         #print("TauxUtilCentreRep : ", TauxUtilCentreRep, "\n")
+
+
+# make data
+x2 = np.linspace(0, 10, 25)
+y2 = np.array(esperance)
+
+# plot
+fig, ax = plt.subplots()
+
+ax.plot(x2, y2, 'o-', linewidth=2)
+
+ax.set(xlim=(0, 8), xticks=np.arange(1, 8),
+       ylim=(0, 8), yticks=np.arange(1, 8))
+
+plt.show()
