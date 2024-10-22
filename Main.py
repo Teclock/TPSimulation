@@ -1,5 +1,6 @@
 from echeancier import Echeancier
 import random
+
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
 
 
@@ -85,6 +86,7 @@ def FinSimulation():
     TmpMoyenAvRep = AireQr / NbBusRep
     TauxUtilCentreRep = AireBr / (2 * TempsSimulateur)
 
+
 def MaJAires(D1, D2):
     global AireQc, AireQr, AireBr, Qc, Qr, Br
     AireQc = AireQc + (D2 - D1) * Qc
@@ -93,6 +95,7 @@ def MaJAires(D1, D2):
 
 nbSimu = 50
 
+# Fichier csv stockant les variables statistiques
 file = open("stat.csv", 'w')
 file.write("Temps simulation; 40h;;; 80h;;; 160h;;; 240h\n")
 file.write("Variable; TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
@@ -104,8 +107,8 @@ liste_TmpMoyAvContr = []
 liste_TmpMoyAvRep = []
 liste_TauxUtilCentreRep = []
 for i in range(0,nbSimu):
-    csvLine = "Simulation n°" + str(i+1) + ";"
-    for j in [40,80,160,240]:
+    csvLine = "Simulation n°" + str(i + 1) + ";"
+    for j in [40, 80, 160, 240]:
         TmpsMoyAvContr_TmpSimu = []
         TmpsMoyAvRep_TmpSimu = []
         TauxUtilCentreRep_TmpSimu = []
@@ -122,7 +125,9 @@ for i in range(0,nbSimu):
             func = globals()[couple[0]]
             func()
 
-        csvLine += str(round(TmpMoyenAvContr, 3)) + "; " + str(round(TmpMoyenAvRep, 3)) + "; " + str(round(TauxUtilCentreRep, 3))  + "; "
+        csvLine += (str(round(TmpMoyenAvContr, 3)) + "; " +
+                    str(round(TmpMoyenAvRep, 3)) + "; " +
+                    str(round(TauxUtilCentreRep, 3)) + "; ")
         TmpsMoyAvContr_TmpSimu.append(TmpMoyenAvContr)
         TmpsMoyAvRep_TmpSimu.append(TmpMoyenAvRep)
         TauxUtilCentreRep_TmpSimu.append(TauxUtilCentreRep)
