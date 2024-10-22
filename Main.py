@@ -1,7 +1,5 @@
 from echeancier import Echeancier
 import random
-import matplotlib.pyplot as plt
-import numpy as np
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
 
 
@@ -93,15 +91,26 @@ def MaJAires(D1, D2):
     AireQr = AireQr + (D2 - D1) * Qr
     AireBr = AireBr + (D2 - D1) * Br
 
-#Simulateur
+nbSimu = 50
+
 file = open("stat.csv", 'w')
-file.write("TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep\n")
+file.write("Temps simulation; 40h;;; 80h;;; 160h;;; 240h\n")
+file.write("Variable; TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
+           "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
+           "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
+           "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep\n")
 
 liste_TmpMoyAvContr = []
 liste_TmpMoyAvRep = []
 liste_TauxUtilCentreRep = []
-for j in [40,80,160,240]:
-    for i in range(0,50):
+for i in range(0,nbSimu):
+    csvLine = "Simulation n°" + str(i+1) + ";"
+    for j in [40,80,160,240]:
+        TmpsMoyAvContr_TmpSimu = []
+        TmpsMoyAvRep_TmpSimu = []
+        TauxUtilCentreRep_TmpSimu = []
+
+        #Simulateur
         TempsSimulateur = j
         DateSimu = float(0)
         echeancier = Echeancier()
@@ -113,24 +122,33 @@ for j in [40,80,160,240]:
             func = globals()[couple[0]]
             func()
 
-        file.write(str(TmpMoyenAvContr) + "; " + str(TmpMoyenAvRep) + "; " + str(TauxUtilCentreRep) + "\n")
+        csvLine += str(round(TmpMoyenAvContr, 3)) + "; " + str(round(TmpMoyenAvRep, 3)) + "; " + str(round(TauxUtilCentreRep, 3))  + "; "
+        TmpsMoyAvContr_TmpSimu.append(TmpMoyenAvContr)
+        TmpsMoyAvRep_TmpSimu.append(TmpMoyenAvRep)
+        TauxUtilCentreRep_TmpSimu.append(TauxUtilCentreRep)
+    file.write(csvLine + "\n")
+    liste_TmpMoyAvContr.append(TmpsMoyAvContr_TmpSimu)
+    liste_TmpMoyAvRep.append(TmpsMoyAvRep_TmpSimu)
+    liste_TauxUtilCentreRep.append(TauxUtilCentreRep_TmpSimu)
+    #print("Simulation #", i+1, " pour ", j, " heures")
+    #print("TmpMoyenAvContr : ", TmpMoyenAvContr)
+    #print("TmpMoyenAvRep : ", TmpMoyenAvRep)
+    #print("TauxUtilCentreRep : ", TauxUtilCentreRep, "\n")
 
-        #print("Simulation #", i+1, " pour ", j, " heures")
-        #print("TmpMoyenAvContr : ", TmpMoyenAvContr)
-        #print("TmpMoyenAvRep : ", TmpMoyenAvRep)
-        #print("TauxUtilCentreRep : ", TauxUtilCentreRep, "\n")
-
-
-# make data
-x2 = np.linspace(0, 10, 25)
-y2 = np.array(esperance)
-
-# plot
-fig, ax = plt.subplots()
-
-ax.plot(x2, y2, 'o-', linewidth=2)
-
-ax.set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
-
-plt.show()
+esperance_TmpMoyAvContr = []
+esperance_TmpMoyAvRep = []
+esperance_TauxUtilCentreRep = []
+file.write(";")
+for i in range(len(liste_TmpMoyAvContr[0])):
+    esperance_TmpMoyAvContr.append(0)
+    esperance_TmpMoyAvRep.append(0)
+    esperance_TauxUtilCentreRep.append(0)
+    for j in range(len(liste_TmpMoyAvContr)):
+        esperance_TmpMoyAvContr[i] += liste_TmpMoyAvContr[j][i]
+        esperance_TmpMoyAvRep[i] += liste_TmpMoyAvRep[j][i]
+        esperance_TauxUtilCentreRep[i] += liste_TauxUtilCentreRep[j][i]
+    esperance_TmpMoyAvContr[i] /= nbSimu
+    esperance_TmpMoyAvRep[i] /= nbSimu
+    esperance_TauxUtilCentreRep[i] /= nbSimu
+    file.write(str(esperance_TmpMoyAvContr[i]) + ";" + str(esperance_TmpMoyAvRep[i]) + ";" + str(esperance_TauxUtilCentreRep[i]) + ";")
+file.close()
