@@ -57,7 +57,6 @@ def DepartReparation():
 
 def DebSimulation():
     global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
-    TempsSimulateur = 80.0
     NbBus = 0
     NbBusRep = 0
     AireQc = 0
@@ -84,16 +83,20 @@ def MaJAires(D1,D2):
     AireBr = AireBr + (D2 - D1)*Br
 
 #Simulateur
-DateSimu = float(0)
-echeancier = Echeancier()
-DebSimulation()
-while echeancier.size() > 0 :
-    couple = echeancier.get_next_event()
-    MaJAires(DateSimu,couple[1])
-    DateSimu = couple[1]
-    func = globals()[couple[0]]
-    func()
+for j in [40,80,160,240]:
+    for i in range(0,50):
+        TempsSimulateur = j
+        DateSimu = float(0)
+        echeancier = Echeancier()
+        DebSimulation()
+        while echeancier.size() > 0:
+            couple = echeancier.get_next_event()
+            MaJAires(DateSimu, couple[1])
+            DateSimu = couple[1]
+            func = globals()[couple[0]]
+            func()
 
-print("TmpMoyenAvContr : ", TmpMoyenAvContr)
-print("TmpMoyenAvRep : ", TmpMoyenAvRep)
-print("TauxUtilCentreRep : ", TauxUtilCentreRep)
+        print("Simulation #", i+1, " pour ", j, " heures")
+        print("TmpMoyenAvContr : ", TmpMoyenAvContr)
+        print("TmpMoyenAvRep : ", TmpMoyenAvRep)
+        print("TauxUtilCentreRep : ", TauxUtilCentreRep, "\n")
