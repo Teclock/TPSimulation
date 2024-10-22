@@ -1,5 +1,5 @@
 from echeancier import Echeancier
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
 import random
 
 def ArriveeBus():
@@ -56,7 +56,8 @@ def DepartReparation():
         echeancier.add_event("AccesReparation", DateSimu)
 
 def DebSimulation():
-    global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu
+    global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
+    TempsSimulateur = 80.0
     NbBus = 0
     NbBusRep = 0
     AireQc = 0
@@ -67,14 +68,14 @@ def DebSimulation():
     Bc = 0
     Br = 0
     echeancier.add_event("ArriveeBus",DateSimu+random.expovariate(1/(3/4)),0)
-    echeancier.add_event("FinSimulation",40.0,0)
+    echeancier.add_event("FinSimulation",TempsSimulateur,0)
 
 def FinSimulation():
-    global TmpMoyenAvContr, TmpMoyenAvRep, TmpUtilCentreRep
+    global TmpMoyenAvContr, TmpMoyenAvRep, TauxUtilCentreRep
     echeancier.clear()
     TmpMoyenAvContr = AireQc / NbBus
     TmpMoyenAvRep = AireQr / NbBusRep
-    TmpUtilCentreRep = AireBr / (2 * 160)
+    TauxUtilCentreRep = AireBr / (2 * TempsSimulateur)
 
 def MaJAires(D1,D2):
     global AireQc, AireQr, AireBr ,Qc, Qr, Br
@@ -95,4 +96,4 @@ while echeancier.size() > 0 :
 
 print("TmpMoyenAvContr : ", TmpMoyenAvContr)
 print("TmpMoyenAvRep : ", TmpMoyenAvRep)
-print("TmpUtilCentreRep : ", TmpUtilCentreRep)
+print("TauxUtilCentreRep : ", TauxUtilCentreRep)
