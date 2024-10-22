@@ -1,5 +1,6 @@
 from echeancier import Echeancier
 import random
+
 global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
 
 
@@ -85,22 +86,26 @@ def FinSimulation():
     TmpMoyenAvRep = AireQr / NbBusRep
     TauxUtilCentreRep = AireBr / (2 * TempsSimulateur)
 
+
 def MaJAires(D1, D2):
     global AireQc, AireQr, AireBr, Qc, Qr, Br
     AireQc = AireQc + (D2 - D1) * Qc
     AireQr = AireQr + (D2 - D1) * Qr
     AireBr = AireBr + (D2 - D1) * Br
 
-#Simulateur
+
+# Fichier csv stockant les variables statistiques
 file = open("stat.csv", 'w')
 file.write("Temps simulation; 40h;;; 80h;;; 160h;;; 240h\n")
 file.write("Variable; TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
            "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
            "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep; " +
            "TmpMoyenAvContr; TmpMoyenAvRep; TauxUtilCentreRep\n")
-for i in range(0,50):
-    csvLine = "Simulation n°" + str(i+1) + ";"
-    for j in [40,80,160,240]:
+
+# Simulateur
+for i in range(0, 50):
+    csvLine = "Simulation n°" + str(i + 1) + ";"
+    for j in [40, 80, 160, 240]:
         TempsSimulateur = j
         DateSimu = float(0)
         echeancier = Echeancier()
@@ -112,9 +117,7 @@ for i in range(0,50):
             func = globals()[couple[0]]
             func()
 
-        csvLine += str(round(TmpMoyenAvContr, 3)) + "; " + str(round(TmpMoyenAvRep, 3)) + "; " + str(round(TauxUtilCentreRep, 3))  + "; "
+        csvLine += (str(round(TmpMoyenAvContr, 3)) + "; " +
+                    str(round(TmpMoyenAvRep, 3)) + "; " +
+                    str(round(TauxUtilCentreRep, 3)) + "; ")
     file.write(csvLine + "\n")
-        #print("Simulation #", i+1, " pour ", j, " heures")
-        #print("TmpMoyenAvContr : ", TmpMoyenAvContr)
-        #print("TmpMoyenAvRep : ", TmpMoyenAvRep)
-        #print("TauxUtilCentreRep : ", TauxUtilCentreRep, "\n")
