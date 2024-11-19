@@ -67,7 +67,7 @@ while not all_correct:
 
 print(categories)
 
-# compute khi var
+# compute error and khi var
 
 k = len(categories)
 error = sum(pow(categories[i][0] - categories[i][1], 2) / categories[i][1] for i in range(len(categories)))
