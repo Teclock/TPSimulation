@@ -1,6 +1,4 @@
 import random
-import matplotlib.pyplot as plt
-import numpy as np
 import scipy
 
 tmps_arrivee = []
@@ -14,10 +12,8 @@ try:
         tmps_controle.append(float(valeurs[1]))
         ligne = fichier.readline()
 except:
-    print("C'est la faute de Benjamin")
+    print("Fichier introuvable")
 finally:
-    print(tmps_arrivee)
-    print(tmps_controle)
     fichier.close()
 
 # duree de controle
@@ -25,11 +21,6 @@ n = len(tmps_controle)
 observed = tmps_controle
 expected = []
 errors = []
-
-# plt.hist(observed, bins=50)
-# plt.ylabel('Frequency')
-# plt.xlabel('Value')
-# plt.show()
 
 # Generation des donnees theoriques
 
