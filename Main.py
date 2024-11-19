@@ -1,73 +1,114 @@
 from echeancier import Echeancier
 import random
 
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, NbBusSorti
+
+class Bus():
+    id = 0
+    tpsAttFileC = 0
+    dateDebFileC = 0
+    tpsAttFileR = 0
+    dateDebFileR = 0
+
+    def __init__(self, id):
+        self.id = id
+        self.tpsAtt = 0
+
+    def setTpsAttFileC(self, wait):
+        self.tpsAttFileC = wait
+
+    def setTpsAttFileR(self, wait):
+        self.tpsAttFileR = wait
+
+    def setDateDebFileC(self, dateDebFileC):
+        self.dateDebFileC = dateDebFileC
+
+    def setDateDebFileR(self, dateDebFileR):
+        self.dateDebFileR = dateDebFileR
 
 
-def ArriveeBus():
+def ArriveeBus(bus = None):
     global NbBus, DateSimu
 
+    NbBus += 1
+    bus = Bus(NbBus)
     heure = DateSimu + random.expovariate(1 / 0.75)
     echeancier.add_event("ArriveeBus", heure)
-    NbBus += 1
-    echeancier.add_event("ArriveeFileC", DateSimu)
+    echeancier.add_event("ArriveeFileC", DateSimu, bus = bus)
 
 
-def ArriveeFileC():
+def ArriveeFileC(bus):
     global Qc, Bc, DateSimu
+
+    bus.setTpsAttFileC(DateSimu)
     Qc = Qc + 1
     if Bc == 0:
-        echeancier.add_event("AccesControle", DateSimu)
+        echeancier.add_event("AccesControle", DateSimu, bus = bus)
 
 
-def AccesControle():
+def AccesControle(bus):
     global Qc, Bc, DateSimu
+
+    bus.setTpsAttFileC(DateSimu - bus.dateDebFileC)
     Qc -= 1
     Bc = 1
     heure = DateSimu + random.uniform(1 / 4, 13 / 12)
-    echeancier.add_event("DepartControle", heure)
+    echeancier.add_event("DepartControle", heure, bus = bus)
 
 
-def DepartControle():
-    global Qc, Bc, DateSimu
+def DepartControle(bus):
+    global Qc, Bc, DateSimu, TmpMoyenAvContr, NbBusSorti
+
     Bc = 0
     if Qc > 0:
-        echeancier.add_event("AccesControle", DateSimu)
+        echeancier.add_event("AccesControle", DateSimu, bus = bus)
     reparation = random.randint(1, 10)
     if reparation <= 3:  # 30% de chance
-        echeancier.add_event("ArriveeFileR", DateSimu)
+        echeancier.add_event("ArriveeFileR", DateSimu, bus = bus)
+    else:
+        TmpMoyenAvContr += bus.tpsAttFileC
+        NbBusSorti += 1
 
-
-def ArriveeFileR():
+def ArriveeFileR(bus):
     global Qr, NbBusRep, Br, DateSimu
 
+    bus.setTpsAttFileR(DateSimu)
     Qr += 1
     NbBusRep += 1
     if Br < 2:
-        echeancier.add_event("AccesReparation", DateSimu)
+        echeancier.add_event("AccesReparation", DateSimu, bus = bus)
 
 
-def AccesReparation():
+def AccesReparation(bus):
     global Qr, Br, DateSimu
 
+    bus.setTpsAttFileR(DateSimu - bus.dateDebFileR)
     Qr -= 1
     Br += 1
     heure = DateSimu + random.uniform(2.8, 5.5)
-    echeancier.add_event("DepartReparation", heure)
+    echeancier.add_event("DepartReparation", heure, bus = bus)
 
 
-def DepartReparation():
-    global Qr, Br, DateSimu
+def DepartReparation(bus):
+    global Qr, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, NbBusSorti
 
+    # Calcul de la question 3 (on comptabilise les temps quand le bus sort du système)
+    TmpMoyenAvContr += bus.tpsAttFileC
+    TmpMoyenAvRep += bus.tpsAttFileR
+    NbBusSorti += 1
     Br -= 1
     if Qr > 0:
-        echeancier.add_event("AccesReparation", DateSimu)
+        echeancier.add_event("AccesReparation", DateSimu, bus = bus)
 
 
-def DebSimulation():
-    global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur
+def DebSimulation(bus = None):
+    global listeBus, NbBus, NbBusRep, NbBusSorti, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, TmpMoyenAvContr, TmpMoyenAvRep
+    listeBus = []
     NbBus = 0
     NbBusRep = 0
+    NbBusSorti = 0
+    TmpMoyenAvContr = 0
+    TmpMoyenAvRep = 0
     AireQc = 0
     AireQr = 0
     AireBr = 0
@@ -75,18 +116,26 @@ def DebSimulation():
     Qr = 0
     Bc = 0
     Br = 0
-    echeancier.add_event("ArriveeBus", DateSimu + random.expovariate(1 / (3 / 4)), 0)
-    echeancier.add_event("FinSimulation", TempsSimulateur, 0)
+    echeancier.add_event("ArriveeBus", DateSimu + random.expovariate(1 / (3 / 4)), None, 0)
+    echeancier.add_event("FinSimulation", TempsSimulateur, None, 1)
 
 
-def FinSimulation():
-    global TmpMoyenAvContr, TmpMoyenAvRep, TauxUtilCentreRep, TempsSimulateur, TailleMoyFileC, TailleMoyFileR
+def FinSimulation(bus = None):
+    global TmpMoyenAvContr, TmpMoyenAvRep, TauxUtilCentreRep, TempsSimulateur, TailleMoyFileC, TailleMoyFileR, NbBus, NbBusRep, NbBusSorti
     echeancier.clear()
-    TmpMoyenAvContr = AireQc / NbBus
-    TmpMoyenAvRep = AireQr / NbBusRep
+    #Calculs pour la question 2
+    #TmpMoyenAvContr = AireQc / NbBus
+    #TmpMoyenAvRep = AireQr / NbBusRep
+
+    # Calculs de la question 3
+    print(TmpMoyenAvContr)
+    TmpMoyenAvContr = TmpMoyenAvContr / NbBusSorti
+    TmpMoyenAvRep = TmpMoyenAvRep / NbBusSorti
+    print(TmpMoyenAvContr)
     TailleMoyFileC = AireQc / TempsSimulateur
     TailleMoyFileR = AireQr / TempsSimulateur
     TauxUtilCentreRep = AireBr / (2 * TempsSimulateur)
+
 
 
 def MaJAires(D1, D2):
@@ -98,7 +147,7 @@ def MaJAires(D1, D2):
 nbSimu = 1000
 
 # Fichier csv stockant les variables statistiques
-file = open("stat.csv", 'w')
+file = open("statQ3.csv", 'w')
 file.write("Temps simulation; 40h;;;;;; 80h;;;;;; 160h;;;;;; 240h\n")
 file.write("Variable; TmpMoyenAvContr; TailleMoyFileC; TmpMoyenAvRep; TailleMoyFileR; TauxUtilCentreRep; NbBus;" +
            "TmpMoyenAvContr; TailleMoyFileC; TmpMoyenAvRep; TailleMoyFileR; TauxUtilCentreRep; NbBus; " +
@@ -132,8 +181,9 @@ for i in range(0,nbSimu):
             couple = echeancier.get_next_event()
             MaJAires(DateSimu, couple[1])
             DateSimu = couple[1]
+            bus = couple[2]
             func = globals()[couple[0]]
-            func()
+            func(bus)
 
         csvLine += (str(round(TmpMoyenAvContr, 3)) + "; " +
                     str(round(TailleMoyFileC, 3)) + "; " +

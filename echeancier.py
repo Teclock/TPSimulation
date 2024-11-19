@@ -3,13 +3,15 @@ class Echeancier:
     def __init__(self):
         self.__echeancier = []
 
-    def add_event(self, event, date, priorite=0):
+    def add_event(self, event, date, bus = None, priorite=0):
         """Ajoute un evenement dans l'echeancier
 
         :param date: date a laquelle declancher l'evenement
         :type date: float
         :param event: evenement a declancher
         :type event: typing.Callable
+        :param bus: bus concerné par l'évènement (None si aucun)
+        :type bus: Bus object
         :param priorite: priorite de l'event en cas d'egalite dans l'echeancier (plus la priorite est elevee, plus l'event est prioritaire
         :type priorite: int
         """
@@ -17,15 +19,15 @@ class Echeancier:
         # trouver l'index ou inserer l'event
         index = 0
         n = len(self.__echeancier)
-        while index < n and (self.__echeancier[index][1] < date or (self.__echeancier[index][1] == date and self.__echeancier[index][2] > priorite)):
+        while index < n and (self.__echeancier[index][1] < date or (self.__echeancier[index][1] == date and self.__echeancier[index][3] > priorite)):
             c1 = index < n
             c2 = self.__echeancier[index][1] < date
             c3 = self.__echeancier[index][1] == date
-            c4 = self.__echeancier[index][2] > priorite
+            c4 = self.__echeancier[index][3] > priorite
             index += 1
 
         # insertion de l'event a l'index voulu
-        self.__echeancier.insert(index, (event, date, priorite))
+        self.__echeancier.insert(index, (event, date, bus, priorite))
 
     def get_next_event(self):
         """Retire le prochain event de l'echeancier et le retourne
