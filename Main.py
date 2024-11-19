@@ -1,7 +1,7 @@
 from echeancier import Echeancier
 import random
 
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, NbBusSortiC, NbBusSortiR, listeBusC, listBusR
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, NbBusSortiC, NbBusSortiR, listeBusC, listBusR, TmpAttContrMax, TmpAttRepMax
 
 class Bus():
     id = 0
@@ -43,11 +43,13 @@ def ArriveeFileC(bus):
 
 
 def AccesControle(bus):
-    global Qc, Bc, DateSimu, TmpMoyenAvContr, NbBusSortiC, listeBusC
+    global Qc, Bc, DateSimu, TmpMoyenAvContr, NbBusSortiC, listeBusC, TmpAttContrMax
 
     listeBusC.pop(0)
     TmpMoyenAvContr += DateSimu - bus.dateDebFileC
     NbBusSortiC += 1
+
+    TmpAttContrMax = max(TmpAttContrMax, DateSimu - bus.dateDebFileC)
     Qc -= 1
     Bc = 1
     heure = DateSimu + random.uniform(1 / 4, 13 / 12)
@@ -76,13 +78,14 @@ def ArriveeFileR(bus):
 
 
 def AccesReparation(bus):
-    global Qr, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, NbBusSortiC, NbBusSortiR, listeBusR
+    global Qr, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, NbBusSortiC, NbBusSortiR, listeBusR, TmpAttRepMax
 
     # Calcul de la question 3 (on comptabilise les temps quand le bus finissent d'attendre)
     TmpMoyenAvRep += DateSimu - bus.dateDebFileR
     NbBusSortiR += 1
 
     listeBusR.pop(0)
+    TmpAttRepMax = max(TmpAttRepMax, DateSimu - bus.dateDebFileR)
     Qr -= 1
     Br += 1
     heure = DateSimu + random.uniform(2.8, 5.5)
@@ -98,7 +101,7 @@ def DepartReparation(bus):
 
 
 def DebSimulation(bus = None):
-    global listeBusC, listeBusR, NbBus, NbBusRep, NbBusSortiC, NbBusSortiR, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, TmpMoyenAvContr, TmpMoyenAvRep
+    global listeBusC, listeBusR, NbBus, NbBusRep, NbBusSortiC, NbBusSortiR, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, TmpMoyenAvContr, TmpMoyenAvRep, TmpAttContrMax, TmpAttRepMax
     listeBusC = []
     listeBusR = []
     NbBus = 0
@@ -114,6 +117,8 @@ def DebSimulation(bus = None):
     Qr = 0
     Bc = 0
     Br = 0
+    TmpAttContrMax = 0
+    TmpAttRepMax = 0
     echeancier.add_event("ArriveeBus", DateSimu + random.expovariate(1 / (3 / 4)), None, 0)
     echeancier.add_event("FinSimulation", TempsSimulateur, None, 1)
 
@@ -247,3 +252,5 @@ for i in range(len(liste_TmpMoyAvContr[0])):
                 str(esperance_TauxUtilCentreRep[i]) + ";" +
                 str(esperance_NbBus[i]) + "; ")
 file.close()
+print("Temps d'attente max avant contrôle (dernière itération): ", TmpAttContrMax)
+print("Temps d'attente max avant réparation (dernière itération): ", TmpAttRepMax)
