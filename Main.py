@@ -1,7 +1,7 @@
 from echeancier import Echeancier
 import random
 
-global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, NbBusSorti
+global NbBus, NbBusRep, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, NbBusSortiC, NbBusSortiR, listeBusC, listBusR
 
 class Bus():
     id = 0
@@ -12,13 +12,8 @@ class Bus():
 
     def __init__(self, id):
         self.id = id
-        self.tpsAtt = 0
-
-    def setTpsAttFileC(self, wait):
-        self.tpsAttFileC = wait
-
-    def setTpsAttFileR(self, wait):
-        self.tpsAttFileR = wait
+        self.dateDebFileC = 0
+        self.dateDebFileR = 0
 
     def setDateDebFileC(self, dateDebFileC):
         self.dateDebFileC = dateDebFileC
@@ -38,18 +33,21 @@ def ArriveeBus(bus = None):
 
 
 def ArriveeFileC(bus):
-    global Qc, Bc, DateSimu
+    global Qc, Bc, DateSimu, listeBusC
 
-    bus.setTpsAttFileC(DateSimu)
+    listeBusC.append(bus)
+    bus.setDateDebFileC(DateSimu)
     Qc = Qc + 1
     if Bc == 0:
         echeancier.add_event("AccesControle", DateSimu, bus = bus)
 
 
 def AccesControle(bus):
-    global Qc, Bc, DateSimu
+    global Qc, Bc, DateSimu, TmpMoyenAvContr, NbBusSortiC, listeBusC
 
-    bus.setTpsAttFileC(DateSimu - bus.dateDebFileC)
+    listeBusC.pop(0)
+    TmpMoyenAvContr += DateSimu - bus.dateDebFileC
+    NbBusSortiC += 1
     Qc -= 1
     Bc = 1
     heure = DateSimu + random.uniform(1 / 4, 13 / 12)
@@ -57,22 +55,20 @@ def AccesControle(bus):
 
 
 def DepartControle(bus):
-    global Qc, Bc, DateSimu, TmpMoyenAvContr, NbBusSorti
+    global Qc, Bc, DateSimu, listeBusC
 
     Bc = 0
     if Qc > 0:
-        echeancier.add_event("AccesControle", DateSimu, bus = bus)
+        echeancier.add_event("AccesControle", DateSimu, bus = listeBusC[0])
     reparation = random.randint(1, 10)
     if reparation <= 3:  # 30% de chance
         echeancier.add_event("ArriveeFileR", DateSimu, bus = bus)
-    else:
-        TmpMoyenAvContr += bus.tpsAttFileC
-        NbBusSorti += 1
 
 def ArriveeFileR(bus):
-    global Qr, NbBusRep, Br, DateSimu
+    global Qr, NbBusRep, Br, DateSimu, listeBusR
 
-    bus.setTpsAttFileR(DateSimu)
+    listeBusR.append(bus)
+    bus.setDateDebFileR(DateSimu)
     Qr += 1
     NbBusRep += 1
     if Br < 2:
@@ -80,9 +76,13 @@ def ArriveeFileR(bus):
 
 
 def AccesReparation(bus):
-    global Qr, Br, DateSimu
+    global Qr, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, NbBusSortiC, NbBusSortiR, listeBusR
 
-    bus.setTpsAttFileR(DateSimu - bus.dateDebFileR)
+    # Calcul de la question 3 (on comptabilise les temps quand le bus finissent d'attendre)
+    TmpMoyenAvRep += DateSimu - bus.dateDebFileR
+    NbBusSortiR += 1
+
+    listeBusR.pop(0)
     Qr -= 1
     Br += 1
     heure = DateSimu + random.uniform(2.8, 5.5)
@@ -90,23 +90,21 @@ def AccesReparation(bus):
 
 
 def DepartReparation(bus):
-    global Qr, Br, DateSimu, TmpMoyenAvContr, TmpMoyenAvRep, NbBusSorti
+    global Qr, Br, DateSimu, listeBusR
 
-    # Calcul de la question 3 (on comptabilise les temps quand le bus sort du système)
-    TmpMoyenAvContr += bus.tpsAttFileC
-    TmpMoyenAvRep += bus.tpsAttFileR
-    NbBusSorti += 1
     Br -= 1
     if Qr > 0:
-        echeancier.add_event("AccesReparation", DateSimu, bus = bus)
+        echeancier.add_event("AccesReparation", DateSimu, bus = listeBusR[0])
 
 
 def DebSimulation(bus = None):
-    global listeBus, NbBus, NbBusRep, NbBusSorti, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, TmpMoyenAvContr, TmpMoyenAvRep
-    listeBus = []
+    global listeBusC, listeBusR, NbBus, NbBusRep, NbBusSortiC, NbBusSortiR, AireQc, AireQr, AireBr, Qc, Qr, Bc, Br, DateSimu, TempsSimulateur, TmpMoyenAvContr, TmpMoyenAvRep
+    listeBusC = []
+    listeBusR = []
     NbBus = 0
     NbBusRep = 0
-    NbBusSorti = 0
+    NbBusSortiC = 0
+    NbBusSortiR = 0
     TmpMoyenAvContr = 0
     TmpMoyenAvRep = 0
     AireQc = 0
@@ -121,17 +119,16 @@ def DebSimulation(bus = None):
 
 
 def FinSimulation(bus = None):
-    global TmpMoyenAvContr, TmpMoyenAvRep, TauxUtilCentreRep, TempsSimulateur, TailleMoyFileC, TailleMoyFileR, NbBus, NbBusRep, NbBusSorti
+    global TmpMoyenAvContr, TmpMoyenAvRep, TauxUtilCentreRep, TempsSimulateur, TailleMoyFileC, TailleMoyFileR, NbBus, NbBusRep, NbBusSortiC, NbBusSortiR
     echeancier.clear()
     #Calculs pour la question 2
     #TmpMoyenAvContr = AireQc / NbBus
     #TmpMoyenAvRep = AireQr / NbBusRep
 
     # Calculs de la question 3
-    print(TmpMoyenAvContr)
-    TmpMoyenAvContr = TmpMoyenAvContr / NbBusSorti
-    TmpMoyenAvRep = TmpMoyenAvRep / NbBusSorti
-    print(TmpMoyenAvContr)
+    TmpMoyenAvContr = TmpMoyenAvContr / NbBusSortiC
+    TmpMoyenAvRep = TmpMoyenAvRep / NbBusSortiR
+
     TailleMoyFileC = AireQc / TempsSimulateur
     TailleMoyFileR = AireQr / TempsSimulateur
     TauxUtilCentreRep = AireBr / (2 * TempsSimulateur)
