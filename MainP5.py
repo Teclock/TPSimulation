@@ -137,6 +137,8 @@ ListeM = np.arange(1,len(ListeMoyenneGlissanteAvCtrl)+1)
 print(ListeMoyenneGlissanteAvCtrl)
 print(ListeM)
 plt.plot(ListeM,ListeMoyenneGlissanteAvCtrl)
+plt.xlabel("Nombre de bus m")
+plt.ylabel("Moyenne glissantes des temps d'attente avant controle")
 plt.show()
 
 
