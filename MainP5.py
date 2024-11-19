@@ -4,6 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
+#Donne la liste des moyennes glissantes de W. C'est la moyenne glissante du cours.
 def MoyenneGlissantes(ListeDesMoyennes,w):
     m = len(ListeDesMoyennes)
     ListeMoyenneGlissantes = []
@@ -100,8 +101,11 @@ def MaJAires(D1,D2):
     AireBr = AireBr + (D2 - D1)*Br
 
 #Simulateur
+#Nombre de réplication n
 n=30
+#Nombre de bus m
 m = 200
+#On initialise le tableau des temps moyen avant contrôle qui sera de taille n*m
 TabTmpMoyenAvContr = []
 for i in range(n):
     LstTmpMoyenAvContr = []
@@ -115,12 +119,15 @@ for i in range(n):
             DateSimu = couple[1]
             func = globals()[couple[0]]
             func()
+            #Sert à n'ajouter qu'une seule fois l'événement "FinSimulation"
             if NbBus >= m and couple[0] != "FinSimulation":
                 echeancier.add_event("FinSimulation", DateSimu, 0)
+        #On ajoute le temps moyen dans le tableau
         LstTmpMoyenAvContr.append(TmpMoyenAvContr)
+    #On ajoute la liste des temps moyens de cette replications
     TabTmpMoyenAvContr.append(LstTmpMoyenAvContr)
 
-
+#On fait la moyenne des tmp par bus.
 ListeMoyenneTmpMoyenAvContr = []
 
 for i in range(m):
@@ -132,6 +139,7 @@ for i in range(m):
 
 
 print(ListeMoyenneTmpMoyenAvContr)
+#On fait à la main les moyennes glissantes.
 ListeMoyenneGlissanteAvCtrl = MoyenneGlissantes(ListeMoyenneTmpMoyenAvContr,25)
 ListeM = np.arange(1,len(ListeMoyenneGlissanteAvCtrl)+1)
 print(ListeMoyenneGlissanteAvCtrl)
