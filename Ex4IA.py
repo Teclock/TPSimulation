@@ -45,6 +45,8 @@ def testkhi():
     # plt.xlabel('Value')
     # plt.show()
 
+    # Génération des valeurs théoriques
+
     for _ in range(n):
         expected.append(random.expovariate(1 / 0.75))
 
@@ -83,6 +85,8 @@ def testkhi():
         else:
             intervalles[9].append(i)
 
+    # Placement des valeurs du fichier
+
     intervalles_expected = [
         [],
         [],
@@ -118,7 +122,7 @@ def testkhi():
         else:
             intervalles_expected[9].append(i)
 
-    i = 0
+    #Ici la condition que tous les intervalles doivent avoir un effectif > 5
     all_correct = all(len(intervalles[i]) >= 5 and len(intervalles_expected[i]) >= 5 for i in range(len(intervalles)))
     print(all_correct)
     while not all_correct:
@@ -135,7 +139,6 @@ def testkhi():
     k = len(intervalles)
     error = 0
     for i in range (len(intervalles)):
-        #print("Vérif n > 5 : ",len(intervalles_expected[i]))
         error += sum([pow(len(intervalles[i]) - len(intervalles_expected[i]), 2) / len(intervalles_expected[i])])
 
     print("error =", error)
@@ -144,10 +147,8 @@ def testkhi():
     print("khi result =", khi)
 
     if (khi < error):
-        #print("H0 rejected")
         return False
     else:
-        #print("H0 accepted")
         return True
 
 compteur_accepte = 0
